@@ -1,0 +1,36 @@
+version: '3'
+services:
+  nginx:
+    container_name: nginx-container        
+    build: ./nginx
+    restart: always
+    ports:
+    - "80:80" 
+    volumes:    
+    - ./nginx/log:/var/log/nginx  
+    - socket_data:/app            
+    depends_on:
+    - flask
+    networks:
+    - webnet
+        
+  flask:
+    container_name: flask-container
+    build: ./flask        
+    restart: always
+    # command: uwsgi  --emperor uwsgi.ini         
+    # command: uwsgi --ini uwsgi.ini 
+    command: sh flask.sh        
+    ports:
+    - "5000:5000"
+    volumes:
+    - .:/app
+    - socket_data:/app
+    networks:
+    - webnet
+
+networks:
+  webnet:
+# 為了讓flask-container裡的bis.sock共享到nginx-container     
+volumes:
+  socket_data:
