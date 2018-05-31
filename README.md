@@ -1,10 +1,13 @@
 # build image
 docker build -t flask_image ./flask --no-cache
+
 docker build -t nginx_image ./nginx --no-cache
 
 # tcp socket
 docker network create --driver bridge bis_network
+
 docker run -d -p 80:80 -v ~/bis/nginx/log:/var/log/nginx --network=bis_network nginx_image
+
 docker run -it -p 5001:5001 -v ~/bis/flask:/app --link nginx:nginx --name flask flask_image /bin/bash    uwsgi --ini uwsgi_test.ini
 
 # unix socket
